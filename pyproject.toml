@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=62.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "0.0.1"
+name = "ask_llm"
+
+requires-python = ">= 3.9"
+
+dependencies = [
+  "transformers>=4.38.0",
+  "datasets>=2.18.0",
+  "optimum>=1.17.1",
+  "torch>=2.1.2",
+  "accelerate>=0.25.0",
+  "auto_gptq>=0.7.1",
+  "autoawq>=0.2.3",
+  "tqdm>=4.66.1",
+]
+
+readme = "README.md"
+
+[project.urls]
+Homepage = "https://github.com/Lauler/ask-llm"
+Issues = "https://github.com/Lauler/ask-llm/issues"
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+line-length = 99
