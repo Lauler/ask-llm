@@ -1,2 +1,5 @@
-/culturax
+culturax*/
 *.egg-info
+venvs
+data/
+__pycache__/
