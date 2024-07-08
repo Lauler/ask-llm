@@ -1,49 +1,68 @@
+from argparse import ArgumentParser
 import torch
 import pandas as pd
 from torch.nn.functional import softmax
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from datasets import load_dataset, Dataset
+from datasets import load_dataset, Dataset, load_from_disk
 from functools import partial
 from tqdm import tqdm
 from ask_llm.prompt import apply_prompt_template
 
+args = ArgumentParser()
+args.add_argument("--model_name", type=str, default="models/Mistral-7B-Instruct-v0.2t")
+args.add_argument("--token", type=str)
+args = args.parse_args()
+
+
 device = "cuda"  # the device to load the model onto
 
 model = AutoModelForCausalLM.from_pretrained(
-    "mistralai/Mistral-7B-Instruct-v0.2",
+    args.model_name,
     torch_dtype=torch.bfloat16,
     device_map="auto",
     attn_implementation="flash_attention_2",
+    cache_dir="models/mistral-7b",
+    token=args.token,
 )
-model = torch.compile(model)
 
-tokenizer = AutoTokenizer.from_pretrained(
-    "mistralai/Mistral-7B-Instruct-v0.2", padding_side="left"
-)
+tokenizer = AutoTokenizer.from_pretrained(args.model_name, padding_side="left", token=args.token)
 
 tokenizer.pad_token = tokenizer.eos_token
 model.config.pad_token_id = model.config.eos_token_id
 
 # Load the dataset in streaming mode
-dataset = load_dataset(
-    "uonlp/CulturaX", "sv", streaming=True, use_auth_token=True, cache_dir="culturax"
-)
+dataset = load_from_disk("culturaxlocal")
+# dataset = load_dataset("wikipedia", language="sv", date="20240520", streaming=True, cache_dir="wiki-sv",)
 
 
 def gen_from_iterable_dataset(iterable_ds):
     yield from iterable_ds
 
 
-ds = dataset["train"].take(2000)
+# ds = dataset["train"].take(2000)
 
-# Convert iterabledataset to dataset
+ds = dataset
+# Convert iterabledataset to dataset1
 ds = Dataset.from_generator(partial(gen_from_iterable_dataset, ds), features=ds.features)
 ds = ds.map(
     apply_prompt_template, batched=False, fn_kwargs={"tokenizer": tokenizer, "max_length": 450}
 )
 
+
+def word_len(example):
+    example["word_count"] = len(example["text"].split(" "))
+    return example
+
+
+ds = ds.map(word_len)
+
+ds = ds.select(list(range(2000)))
+ds = ds.sort("word_count")
+
+# ds = ds.remove_columns(["id", "meta"])
 # Turn ds into a dataloader
-dataloader = torch.utils.data.DataLoader(ds, batch_size=4, num_workers=3)
+dataloader = torch.utils.data.DataLoader(ds, batch_size=8, num_workers=3)
+
 
 probs_450 = []
 text_dicts = []
@@ -57,7 +76,7 @@ for batch in tqdm(dataloader):
         padding=True,
         truncation=True,
         return_attention_mask=True,
-        add_special_tokens=False,
+        add_special_tokens=True,
     ).to(device)
 
     generated_ids = model.generate(
@@ -75,29 +94,10 @@ for batch in tqdm(dataloader):
         prob = softmax_score[tokenizer.convert_tokens_to_ids("▁Yes")].to("cpu").item()
         text_dicts.append(
             {
-                "text": batch["text"][i],
-                "url": batch["url"][i],
-                "timestamp": batch["timestamp"][i],
+                "text": " ".join(batch["text"][i].split(" ")[:450]),
+                # "text_prompt": batch["text_prompt"][i],
+                # "url": batch["url"][i],
+                # "timestamp": batch["timestamp"][i],
                 "prob": prob,
             }
         )
-
-df = pd.DataFrame(text_dicts)
-df.sort_values("prob", ascending=False)[1126:1127].values
-
-# Flatten the list of tensors
-probs_450 = torch.cat(probs_450).tolist()
-
-
-# Find index with minimum prob
-min_prob_index = probs_450.index(min(probs_450))
-argmin_prob_index = torch.argmin(torch.tensor(probs_450))
-
-df = pd.DataFrame(
-    {
-        "probs_450": probs_450[0:192],
-    }
-)
-
-# Correlation matrix
-df.corr()

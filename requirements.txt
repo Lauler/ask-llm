@@ -3,9 +3,12 @@ torch
 datasets
 ninja
 packaging
-flash-attn
+wheel
+# flash-attn
 tqdm
 optimum
 accelerate
+outlines
 auto_gptq
 autoawq
+zstandard

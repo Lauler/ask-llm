@@ -12,7 +12,11 @@ pip install --editable .
 
 ### Huggingface inference
 
-See `askllm_hf.py`. 
+See 
+
+* `askllm_hf.py` for Ask-LLM style inference with Huggingface.
+* `fineweb_hf_llama.py` for Fineweb-Edu style document scoring with Llama3-70b-instruct.
+* `fineweb_hf_gemma.py` for Fineweb-Edu style document scoring with Gemma2-27b-it.
 
 ### TensorRT-LLM inference
 
@@ -47,6 +51,7 @@ python3 scripts/download_model_checkpoint.py
 ### Lessons learned
 
 * Quantized models consume less memory but don't necessarily have higher throughput (tokens/second).
+* torch.compile doesn't seem to provide a significant speedup over flash attention 2.
 
 ### TODO
 
@@ -54,3 +59,9 @@ python3 scripts/download_model_checkpoint.py
 * [ ] Benchmark throughput with different pretraining document text lengths (truncate).
 * [ ] Get TensorRT-LLM to work on HPC nodes.
 
+### Benchmarks
+
+Scoring 500k documents with Fineweb-Edu style scoring on A100s with 65GB VRAM:
+
+* 560 A100 GPU hours for Llama3-70b-instruct.
+* 280 A100 GPU hours for Gemma2-27b-it.
