@@ -9,10 +9,17 @@ from argparse import ArgumentParser
 
 args = ArgumentParser()
 args.add_argument("--model_name", type=str, default="models/gemma-2-27b-it")
-args.add_argument("--prompt", type=str, default=PROMPT_SV)
+args.add_argument("--prompt", type=str, default="swedish")
 args.add_argument("--data_shard", type=int, default=0)
 args.add_argument("--num_samples", type=int, default=40)
 args = args.parse_args()
+
+if args.prompt == "fineweb":
+    PROMPT = PROMPT_FINEWEB
+elif args.prompt == "swedish":
+    PROMPT = PROMPT_SV
+elif args.prompt == "english":
+    PROMPT = PROMPT_EN
 
 
 model = AutoModelForCausalLM.from_pretrained(
@@ -49,7 +56,7 @@ ds = ds.map(
     batched=False,
     num_proc=8,
     fn_kwargs={
-        "prompt": PROMPT_SV,
+        "prompt": PROMPT,
         "tokenizer": tokenizer,
         "language": "svenska",
         "max_words": 250,

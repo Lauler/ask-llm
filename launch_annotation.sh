@@ -2,7 +2,7 @@
 
 #### Meta-Llama-3-70B-Instruct
 MODEL_NAME="models/Meta-Llama-3-70B-Instruct"
-PROMPT=PROMPT_SV
+PROMPT="swedish"
 NUM_SAMPLES=8000
 PROJECT=/leonardo_work/EUHPC_D07_027/scandinavian-lm/faton/ask-llm
 
@@ -17,7 +17,7 @@ done
 
 # #### gemma-2-27b-it
 # MODEL_NAME="models/gemma-2-27b-it"
-# PROMPT=PROMPT_SV
+# PROMPT="swedish"
 # NUM_SAMPLES=8000
 # PROJECT=/leonardo_work/EUHPC_D07_027/scandinavian-lm/faton/ask-llm
 
