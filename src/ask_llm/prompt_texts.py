@@ -1,4 +1,5 @@
-PROMPT_SV = """Nedan finns ett utdrag från en webbsida på {language}. Utvärdera huruvida sidan har ett högt pedagogiskt värde och skulle kunna vara användbar i en utbildningsmiljö för undervisning med hjälp av det additiva 4-poängssystemet som beskrivs nedan. Poäng ackumuleras baserat på uppfyllandet av varje kriterium:
+PROMPT_SV = [
+    """Nedan finns ett utdrag från en webbsida på {language}. Utvärdera huruvida sidan har ett högt pedagogiskt värde och skulle kunna vara användbar i en utbildningsmiljö för undervisning med hjälp av det additiva 4-poängssystemet som beskrivs nedan. Poäng ackumuleras baserat på uppfyllandet av varje kriterium:
 
 - Lägg till 1 poäng om utdraget innehåller viss omvärldsinformation som är relevant för utbildningsämnen, även om det inkluderar en mindre mängd irrelevant eller icke-akademiskt innehåll som annonser och marknadsföringsmaterial.
 - Lägg till ytterligare en poäng om utdraget är lämpligt för utbildningsändamål och introducerar nyckelbegrepp som är relevanta inom skolplaner. Texten är sammanhängande även om innehållet inte nödändigtvis är heltäckande. Den kan innehålla viss överflödig information. 
@@ -7,14 +8,17 @@ PROMPT_SV = """Nedan finns ett utdrag från en webbsida på {language}. Utvärde
 
 Om texten är osammanhängande, till stora delen innehåller upplistningar utan informativt innehåll, eller endast innehåller ren SEO- eller marknadsföringsmaterial, ge då 0 poäng.
 
-Utdraget: {extract}
-
+Utdraget:
+""",
+    """
 Efter att ha undersökt utdraget:
 
 * Motivera först kortfattat din totala poäng, upp till 50 ord.
-* Avsluta ditt svar med poängen i formatet: "Pedagogiskt värde: <total poäng>"""
+* Avsluta ditt svar med poängen i formatet: "Pedagogiskt värde: <total poäng>""",
+]
 
-PROMPT_EN = """Below is an extract from a web page in {language}. Evaluate whether the page has a high educational value and could be useful in an educational setting for teaching using the additive 4-point scoring system described below. Points are accumulated based on the satisfaction of each criterion:
+PROMPT_EN = [
+    """Below is an extract from a web page in {language}. Evaluate whether the page has a high educational value and could be useful in an educational setting for teaching using the additive 4-point scoring system described below. Points are accumulated based on the satisfaction of each criterion:
 
 - Add 1 point if the extract provides some basic information or world knowledge relevant to educational topics, even if it includes some irrelevant or non-academic content like advertisements and promotional material.
 - Add another point if the extract is suitable for educational purposes and introduces key concepts relevant to school curricula. The text is coherent even if the content is not necessarily comprehensive. It may contain some redundant information.
@@ -23,14 +27,17 @@ PROMPT_EN = """Below is an extract from a web page in {language}. Evaluate wheth
 
 If the text is incoherent, mostly consists of lists without informative content, or only contains pure SEO or marketing material, then give 0 points.
 
-The extract: {extract}
-
+The extract:
+""",
+    """
 After examining the extract:
 
 * First briefly justify your total score, up to 50 words.
-* Conclude with the score in the format: "Educational value: <total points>"""
+* Conclude with the score in the format: "Educational value: <total points>""",
+]
 
-PROMPT_FINEWEB = """Below is an extract from a web page in {language}. Evaluate whether the page has a high educational value and could be useful in an educational setting for teaching from primary school to grade school levels using the additive 5-point scoring system described below. Points are accumulated based on the satisfaction of each criterion:
+PROMPT_FINEWEB = [
+    """Below is an extract from a web page in {language}. Evaluate whether the page has a high educational value and could be useful in an educational setting for teaching from primary school to grade school levels using the additive 5-point scoring system described below. Points are accumulated based on the satisfaction of each criterion:
 
 - Add 1 point if the extract provides some basic information relevant to educational topics, even if it includes some irrelevant or non-academic content like advertisements and promotional material.
 - Add another point if the extract addresses certain elements pertinent to education but does not align closely with educational standards. It might mix educational content with non-educational material, offering a superficial overview of potentially useful topics, or presenting information in a disorganized manner and incoherent writing style.
@@ -38,12 +45,13 @@ PROMPT_FINEWEB = """Below is an extract from a web page in {language}. Evaluate 
 - Grant a fourth point if the extract highly relevant and beneficial for educational purposes for a level not higher than grade school, exhibiting a clear and consistent writing style. It could be similar to a chapter from a textbook or a tutorial, offering substantial educational content, including exercises and solutions, with minimal irrelevant information, and the concepts aren't too advanced for grade school students. The content is coherent, focused, and valuable for structured learning.
 - Bestow a fifth point if the extract is outstanding in its educational value, perfectly suited for teaching either at primary school or grade school. It follows detailed reasoning, the writing style is easy to follow and offers profound and thorough insights into the subject matter, devoid of any non-educational or complex content.
 
-The extract: {extract}
-
+The extract:""",
+    """
 After examining the extract:
 
 * First briefly justify your total score, up to 100 words.
-* Conclude with the score using the format: "Educational score: <total points>"""
+* Conclude with the score using the format: "Educational score: <total points>""",
+]
 
 
 PROMPT_CLEANNESS = {
