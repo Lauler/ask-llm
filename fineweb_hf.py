@@ -62,6 +62,11 @@ dataset = load_dataset(
 dataset = dataset.shuffle(seed=666)
 ds = dataset.take(args.num_samples)
 
+# compute ppl for pkv
+prompt_prefix_length = fineweb_prompt_prefix_length(
+    PROMPT, tokenizer, language="svenska", prompt_type=prompt_type
+)
+
 # Apply prompt template and save the result
 ds = ds.map(
     apply_fineweb_prompt,
@@ -75,6 +80,16 @@ ds = ds.map(
         "prompt_type": prompt_type,
     },
 )
+
+# TODO
+# generate on some data example to get past_key_values
+# Split the input into two parts: "Hello, my dog is" and "cute"
+# context_ids = ids[:, :-1]
+# next_word_ids = ids[:, -1:]
+#
+# # Generate a continuation using caching (past_key_values)
+# output = model(input_ids=context_ids, use_cache=True)
+# past_key_values = output.past_key_values
 
 dataloader = torch.utils.data.DataLoader(
     ds, batch_size=args.batch_size, num_workers=2, pin_memory=True
