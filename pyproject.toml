@@ -9,7 +9,7 @@ name = "ask_llm"
 requires-python = ">= 3.9"
 
 dependencies = [
-  "transformers>=4.38.0",
+  "transformers>=4.44.0",
   "datasets>=2.18.0",
   "optimum>=1.17.1",
   "torch>=2.1.2",

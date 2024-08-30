@@ -3,7 +3,17 @@ from argparse import ArgumentParser
 from functools import partial
 from tqdm import tqdm
 from ask_llm.prompt import apply_fineweb_prompt
-from ask_llm.prompt_texts import PROMPT_EN, PROMPT_SV, PROMPT_FINEWEB
+from ask_llm.prompt_texts import (
+    PROMPT_EN,
+    PROMPT_SV,
+    PROMPT_FINEWEB,
+    PROMPT_FINEWEB_JSON_NO,
+    PROMPT_FINEWEB_JSON_SV,
+    PROMPT_FINEWEB_LANG_NO,
+    PROMPT_FINEWEB_LANG_SV,
+    PROMPT_FINEWEB_SV,
+    PROMPT_FINEWEB_NO,
+)
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset, Dataset, load_from_disk
 import torch
@@ -32,13 +42,28 @@ elif args.prompt == "swedish":
     PROMPT = PROMPT_SV
 elif args.prompt == "english":
     PROMPT = PROMPT_EN
+elif args.prompt == "fineweb_json_no":
+    PROMPT = PROMPT_FINEWEB_JSON_NO
+elif args.prompt == "fineweb_json_sv":
+    PROMPT = PROMPT_FINEWEB_JSON_SV
+elif args.prompt == "fineweb_sv":
+    PROMPT = PROMPT_FINEWEB_SV
+elif args.prompt == "fineweb_no":
+    PROMPT = PROMPT_FINEWEB_NO
+elif args.prompt == "fineweb_lang_no":
+    PROMPT = PROMPT_FINEWEB_LANG_NO
+elif args.prompt == "fineweb_lang_sv":
+    PROMPT = PROMPT_FINEWEB_LANG_SV
 
-prompt_type = None
+model_type = None
 attn_implementation = "flash_attention_2"
 if "llama" in args.model_name.lower():
-    prompt_type = "llama"
+    if "8b" in args.model_name.lower():
+        model_type = "llama8b"
+    elif "70b" in args.model_name.lower():
+        model_type = "llama70b"
 elif "gemma" in args.model_name.lower():
-    prompt_type = "gemma"
+    model_type = "gemma"
 
 logging.info(f"Loading model: {args.model_name}")
 model = AutoModelForCausalLM.from_pretrained(
@@ -48,13 +73,13 @@ model = AutoModelForCausalLM.from_pretrained(
     attn_implementation=attn_implementation,
     cache_dir=args.cache_dir,
 )
-
 tokenizer = AutoTokenizer.from_pretrained(args.model_name, padding_side="left")
 tokenizer.pad_token = tokenizer.eos_token
 model.config.pad_token_id = model.config.eos_token_id
 
 
 # dataset = load_dataset("data/culturax_sv_sharded", num_proc=12)
+logging.info(f"Loading dataset: {args.input_file}")
 dataset = load_dataset(
     "json",
     data_files={"train": args.input_file},
@@ -62,16 +87,16 @@ dataset = load_dataset(
     cache_dir="data/cache_dir",
 )
 
-# should shuffle before take
-dataset = dataset.shuffle(seed=666)
-ds = dataset.take(args.num_samples)
+ds = dataset
 
-# # compute ppl for pkv
-# prompt_prefix_length = fineweb_prompt_prefix_length(
-#     PROMPT, tokenizer, language="svenska", prompt_type=prompt_type
-# )
+# Filter for language in the dataset
+if "sv" in args.prompt:
+    ds = ds.filter(lambda x: x["language"] == "sv")
+elif "no" in args.prompt:
+    ds = ds.filter(lambda x: x["language"] == "no")
 
 # Apply prompt template and save the result
+logging.info(f"Applying prompts")
 ds = ds.map(
     apply_fineweb_prompt,
     batched=False,
@@ -81,20 +106,13 @@ ds = ds.map(
         "tokenizer": tokenizer,
         "language": args.language,
         "max_tokens": 512,
-        "prompt_type": prompt_type,
+        "prompt_type": model_type,
     },
 )
 
-# TODO
-# generate on some data example to get past_key_values
-# Split the input into two parts: "Hello, my dog is" and "cute"
-# context_ids = ids[:, :-1]
-# next_word_ids = ids[:, -1:]
-#
-# # Generate a continuation using caching (past_key_values)
-# output = model(input_ids=context_ids, use_cache=True)
-# past_key_values = output.past_key_values
+logging.info(f"Example: {ds[0]}")
 
+logging.info(f"create dataloader")
 dataloader = torch.utils.data.DataLoader(
     ds, batch_size=args.batch_size, num_workers=2, pin_memory=True
 )
@@ -102,6 +120,7 @@ dataloader = torch.utils.data.DataLoader(
 generated_texts = []
 
 # Generate with dataloader
+logging.info(f"annotate batches")
 for batch in tqdm(dataloader):
     text_prompts = batch["text_prompt"]
     model_inputs = tokenizer(
@@ -127,4 +146,14 @@ for batch in tqdm(dataloader):
 
 # Add to the dataset
 ds = ds.add_column("text_score", generated_texts)
-ds.to_parquet(os.path.join(args.output_dir, os.path.basename(args.input_file) + ".parquet"))
+# ds.to_parquet(os.path.join(args.output_dir, os.path.basename(args.input_file) + f"{prompt_type}.{args.prompt}.parquet"))
+
+ds = ds.add_column("model_name", [args.model_name] * len(ds))
+ds = ds.add_column("prompt_type", [args.prompt] * len(ds))
+
+ds.to_json(
+    os.path.join(
+        args.output_dir, os.path.basename(args.input_file) + f"{model_type}.{args.prompt}.jsonl"
+    ),
+    force_ascii=False,
+)

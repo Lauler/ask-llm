@@ -3,3 +3,5 @@ culturax*/
 venvs
 data/
 __pycache__/
+logs/
+eval/

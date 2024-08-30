@@ -6,7 +6,7 @@ PROMPT_SV = [
 - Tilldela en tredje poäng om utdraget är högst relevant för utbildningsändamål och skriven på ett på ett tydligt och sammanhängande sätt. Det kan likna ett kapitel i en lärobok eller en handledning och innehåller betydande pedagogiskt innehåll, som exempelvis övningar och lösningar, med minimalt irrelevant innehåll.
 - Ge en fjärde poäng om utdraget är utmärkt i sitt pedagogiska värde och passar perfekt för undervisning. Det följer detaljerade resonemang. Texten är lätt att följa och erbjuder djupgående och genomtänkta insikter i ämnet, utan inslag av icke-pedagogiskt innehåll som använder sig av allt för komplexa begrepp.
 
-Om texten är osammanhängande, till stora delen innehåller upplistningar utan informativt innehåll, eller endast innehåller ren SEO- eller marknadsföringsmaterial, ge då 0 poäng.
+Om texten är osammanhängande, till större delen innehåller upplistningar utan informativt innehåll, eller endast innehåller ren SEO- eller marknadsföringsmaterial, ge då 0 poäng.
 
 Utdraget:
 """,
@@ -15,6 +15,112 @@ Efter att ha undersökt utdraget:
 
 * Motivera först kortfattat din totala poäng, upp till 50 ord.
 * Avsluta ditt svar med poängen i formatet: "Pedagogiskt värde: <total poäng>""",
+]
+
+PROMPT_FINEWEB_JSON_SV = [
+    """Nedan är ett utdrag från en webbsida. Utvärdera om sidan har ett högt pedagogiskt värde och kan vara användbar i en pedagogisk miljö för undervisning från grundskola upp till gymnasieskola med hjälp av det additiva 5-punktssystemet som beskrivs nedan. Poäng ackumuleras baserat på uppfyllandet av varje kriterium:
+
+- Lägg till 1 poäng om utdraget ger viss grundläggande information som är relevant för utbildningsämnen, även om det inkluderar viss irrelevant eller icke-akademiskt innehåll som annonser och reklammaterial.
+- Lägg till ytterligare en poäng om utdraget tar upp vissa element som är relevanta för utbildning men som inte stämmer överens med utbildningsstandarder. Det kan blanda pedagogiskt innehåll med icke-pedagogiskt material, erbjuda en ytlig översikt över potentiellt användbara ämnen eller presentera information på ett oorganiserat sätt och med en osammanhängande skrivstil.
+- Tilldela en tredje poäng om utdraget är lämpligt för utbildningsändamål och introducerar nyckelkoncept som är relevanta för skolans eller gymnasieskolans läroplaner. Det är sammanhängande även om det kanske inte är omfattande eller kan inkludera viss överflödig information. Det kan likna en inledande del av en lärobok eller en grundläggande handledning som är lämplig för lärande men har märkbara begränsningar som att behandla komplexa koncept ytligt.
+- Ge en fjärde poäng om utdraget är mycket relevant och fördelaktigt för pedagogiska ändamål och uppvisar en klar och konsekvent skrivstil. Det kan vara likt ett kapitel från en lärobok eller en detaljerad handledning som erbjuder omfattande pedagogiskt innehåll, inklusive övningar och lösningar, med minimal irrelevant information. Innehållet är sammanhängande, fokuserat och värdefullt för strukturerat lärande.
+- Tilldela en femte poäng om utdraget är enastående i sitt pedagogiska värde, perfekt lämpat för undervisning upp till gymnasieskola. Det följer detaljerad logik, skrivstilen är lätt att följa och erbjuder djupgående och grundliga insikter i ämnet, utan icke-pedagogiskt eller överdrivet komplext innehåll.
+
+Utdraget: """,
+    """
+Efter att ha granskat utdraget:
+
+* Motivera kort din totala poäng, upp till 100 ord.
+* Ditt svar ska vara i json med fälten \"reason\" och \"educational_score\", där den första är en sträng och den andra ett heltal.""",
+]
+
+PROMPT_FINEWEB_SV = [
+    """Nedan är ett utdrag från en webbsida. Utvärdera om sidan har ett högt pedagogiskt värde och kan vara användbar i en pedagogisk miljö för undervisning från grundskola upp till gymnasieskola med hjälp av det additiva 5-punktssystemet som beskrivs nedan. Poäng ackumuleras baserat på uppfyllandet av varje kriterium:
+
+- Lägg till 1 poäng om utdraget ger viss grundläggande information som är relevant för utbildningsämnen, även om det inkluderar viss irrelevant eller icke-akademiskt innehåll som annonser och reklammaterial.
+- Lägg till ytterligare en poäng om utdraget tar upp vissa element som är relevanta för utbildning men som inte stämmer överens med utbildningsstandarder. Det kan blanda pedagogiskt innehåll med icke-pedagogiskt material, erbjuda en ytlig översikt över potentiellt användbara ämnen eller presentera information på ett oorganiserat sätt och med en osammanhängande skrivstil.
+- Tilldela en tredje poäng om utdraget är lämpligt för utbildningsändamål och introducerar nyckelkoncept som är relevanta för skolans eller gymnasieskolans läroplaner. Det är sammanhängande även om det kanske inte är omfattande eller kan inkludera viss överflödig information. Det kan likna en inledande del av en lärobok eller en grundläggande handledning som är lämplig för lärande men har märkbara begränsningar som att behandla komplexa koncept ytligt.
+- Ge en fjärde poäng om utdraget är mycket relevant och fördelaktigt för pedagogiska ändamål och uppvisar en klar och konsekvent skrivstil. Det kan vara likt ett kapitel från en lärobok eller en detaljerad handledning som erbjuder omfattande pedagogiskt innehåll, inklusive övningar och lösningar, med minimal irrelevant information. Innehållet är sammanhängande, fokuserat och värdefullt för strukturerat lärande.
+- Tilldela en femte poäng om utdraget är enastående i sitt pedagogiska värde, perfekt lämpat för undervisning upp till gymnasieskola. Det följer detaljerad logik, skrivstilen är lätt att följa och erbjuder djupgående och grundliga insikter i ämnet, utan icke-pedagogiskt eller överdrivet komplext innehåll.
+
+Utdraget: """,
+    """
+Efter att ha granskat utdraget:
+
+* Motivera först kortfattat din totala poäng, upp till 100 ord.
+* Avsluta ditt svar med poängen i formatet: \"Pedagogiskt värde: <total poäng>\"""",
+]
+
+PROMPT_FINEWEB_LANG_SV = [
+    """Nedan är ett utdrag från en webbsida. Utvärdera om sidan har ett högt pedagogiskt värde och kan vara användbar i en pedagogisk miljö för undervisning från grundskola upp till gymnasieskola med hjälp av det additiva 5-punktssystemet som beskrivs nedan. Poäng ackumuleras baserat på uppfyllandet av varje kriterium:
+
+- Lägg till 1 poäng om utdraget ger viss grundläggande information som är relevant för utbildningsämnen, även om det inkluderar viss irrelevant eller icke-akademiskt innehåll som annonser och reklammaterial.
+- Lägg till ytterligare en poäng om utdraget tar upp vissa element som är relevanta för utbildning men som inte stämmer överens med utbildningsstandarder. Det kan blanda pedagogiskt innehåll med icke-pedagogiskt material, erbjuda en ytlig översikt över potentiellt användbara ämnen eller presentera information på ett oorganiserat sätt och med en osammanhängande skrivstil.
+- Tilldela en tredje poäng om utdraget är lämpligt för utbildningsändamål och introducerar nyckelkoncept som är relevanta för skolans eller gymnasieskolans läroplaner. Det är sammanhängande även om det kanske inte är omfattande eller kan inkludera viss överflödig information. Det kan likna en inledande del av en lärobok eller en grundläggande handledning som är lämplig för lärande men har märkbara begränsningar som att behandla komplexa koncept ytligt.
+- Ge en fjärde poäng om utdraget är mycket relevant och fördelaktigt för pedagogiska ändamål och uppvisar en klar och konsekvent skrivstil. Det kan vara likt ett kapitel från en lärobok eller en detaljerad handledning som erbjuder omfattande pedagogiskt innehåll, inklusive övningar och lösningar, med minimal irrelevant information. Innehållet är sammanhängande, fokuserat och värdefullt för strukturerat lärande.
+- Tilldela en femte poäng om utdraget är enastående i sitt pedagogiska värde, perfekt lämpat för undervisning upp till gymnasieskola. Det följer detaljerad logik, skrivstilen är lätt att följa och erbjuder djupgående och grundliga insikter i ämnet, utan icke-pedagogiskt eller överdrivet komplext innehåll.
+
+Utdraget bör vara på svenska. Om det är till största delen på ett annat språk bör 0 poäng ges.
+
+Utdraget: """,
+    """
+Efter att ha granskat utdraget:
+
+* Motivera först kortfattat din totala poäng, upp till 100 ord.
+* Avsluta ditt svar med poängen i formatet: \"Pedagogiskt värde: <total poäng>\"""",
+]
+
+PROMPT_FINEWEB_JSON_NO = [
+    """Nedenfor er et utdrag fra en nettside. Vurder om siden har høy pedagogisk verdi og kan være nyttig i en pedagogisk setting for undervisning fra barneskole opp til videregående skole ved hjelp av det additive 5-punkts vurderingssystemet beskrevet nedenfor. Poeng akkumuleres basert på tilfredsstillelse av hvert kriterium:
+
+- Legg til 1 poeng hvis utdraget gir noen grunnleggende informasjon som er relevant for pedagogiske emner, selv om det inkluderer noe irrelevant eller ikke-akademisk innhold som annonser og reklame.
+- Legg til et annet poeng hvis utdraget tar for seg visse elementer som er relevante for utdanning, men ikke stemmer overens med utdanningsstandarder. Det kan blande pedagogisk innhold med ikke-pedagogisk materiale, tilby en overfladisk oversikt over potensielt nyttige emner, eller presentere informasjon på en uorganisert måte og med en usammenhengende skrivestil.
+- Tildel et tredje poeng hvis utdraget er egnet for pedagogisk bruk og introduserer viktige konsepter som er relevante for skole- eller videregående pensum. Det er sammenhengende, selv om det kanskje ikke er omfattende eller kan inneholde noe overflødig informasjon. Det kan ligne en innledende del av en lærebok eller en grunnleggende veiledning som er egnet for læring, men har merkbare begrensninger som å behandle komplekse konsepter overfladisk.
+- Gi et fjerde poeng hvis utdraget er svært relevant og nyttig for pedagogiske formål, og viser en klar og konsekvent skrivestil. Det kan være likt et kapittel fra en lærebok eller en detaljert veiledning som tilbyr betydelig pedagogisk innhold, inkludert øvelser og løsninger, med minimal irrelevant informasjon. Innholdet er sammenhengende, fokusert og verdifullt for strukturert læring.
+- Tildel et femte poeng hvis utdraget er enestående i sin pedagogiske verdi, perfekt egnet for undervisning opp til videregående skole. Det følger detaljert resonnement, skrivestilen er lett å følge og tilbyr grundig innsikt i emnet, uten ikke-pedagogisk eller overdrevent komplekst innhold.
+
+Utdraget: """,
+    """
+Etter å ha undersøkt utdraget:
+
+* Begrunn kort din totale poengsum, opptil 100 ord.
+* Tilbakemeldingen skal være i json med feltene \"reason\" and \"educational score\", hvor den første er en tekststreng og den siste en integer.""",
+]
+
+PROMPT_FINEWEB_NO = [
+    """Nedenfor er et utdrag fra en nettside. Vurder om siden har høy pedagogisk verdi og kan være nyttig i en pedagogisk setting for undervisning fra barneskole opp til videregående skole ved hjelp av det additive 5-punkts vurderingssystemet beskrevet nedenfor. Poeng akkumuleres basert på tilfredsstillelse av hvert kriterium:
+
+- Legg til 1 poeng hvis utdraget gir noen grunnleggende informasjon som er relevant for pedagogiske emner, selv om det inkluderer noe irrelevant eller ikke-akademisk innhold som annonser og reklame.
+- Legg til et annet poeng hvis utdraget tar for seg visse elementer som er relevante for utdanning, men ikke stemmer overens med utdanningsstandarder. Det kan blande pedagogisk innhold med ikke-pedagogisk materiale, tilby en overfladisk oversikt over potensielt nyttige emner, eller presentere informasjon på en uorganisert måte og med en usammenhengende skrivestil.
+- Tildel et tredje poeng hvis utdraget er egnet for pedagogisk bruk og introduserer viktige konsepter som er relevante for skole- eller videregående pensum. Det er sammenhengende, selv om det kanskje ikke er omfattende eller kan inneholde noe overflødig informasjon. Det kan ligne en innledende del av en lærebok eller en grunnleggende veiledning som er egnet for læring, men har merkbare begrensninger som å behandle komplekse konsepter overfladisk.
+- Gi et fjerde poeng hvis utdraget er svært relevant og nyttig for pedagogiske formål, og viser en klar og konsekvent skrivestil. Det kan være likt et kapittel fra en lærebok eller en detaljert veiledning som tilbyr betydelig pedagogisk innhold, inkludert øvelser og løsninger, med minimal irrelevant informasjon. Innholdet er sammenhengende, fokusert og verdifullt for strukturert læring.
+- Tildel et femte poeng hvis utdraget er enestående i sin pedagogiske verdi, perfekt egnet for undervisning opp til videregående skole. Det følger detaljert resonnement, skrivestilen er lett å følge og tilbyr grundig innsikt i emnet, uten ikke-pedagogisk eller overdrevent komplekst innhold.
+
+Utdraget: """,
+    """
+Etter å ha undersøkt utdraget:
+
+* Begrunn kort din totale poengsum, opptil 100 ord.
+* Avslutt ditt svar med poeng i formatet: \"Pedagogisk verdi: <total poeng>\"""",
+]
+
+PROMPT_FINEWEB_LANG_NO = [
+    """Nedenfor er et utdrag fra en nettside. Vurder om siden har høy pedagogisk verdi og kan være nyttig i en pedagogisk setting for undervisning fra barneskole opp til videregående skole ved hjelp av det additive 5-punkts vurderingssystemet beskrevet nedenfor. Poeng akkumuleres basert på tilfredsstillelse av hvert kriterium:
+
+- Legg til 1 poeng hvis utdraget gir noen grunnleggende informasjon som er relevant for pedagogiske emner, selv om det inkluderer noe irrelevant eller ikke-akademisk innhold som annonser og reklame.
+- Legg til et annet poeng hvis utdraget tar for seg visse elementer som er relevante for utdanning, men ikke stemmer overens med utdanningsstandarder. Det kan blande pedagogisk innhold med ikke-pedagogisk materiale, tilby en overfladisk oversikt over potensielt nyttige emner, eller presentere informasjon på en uorganisert måte og med en usammenhengende skrivestil.
+- Tildel et tredje poeng hvis utdraget er egnet for pedagogisk bruk og introduserer viktige konsepter som er relevante for skole- eller videregående pensum. Det er sammenhengende, selv om det kanskje ikke er omfattende eller kan inneholde noe overflødig informasjon. Det kan ligne en innledende del av en lærebok eller en grunnleggende veiledning som er egnet for læring, men har merkbare begrensninger som å behandle komplekse konsepter overfladisk.
+- Gi et fjerde poeng hvis utdraget er svært relevant og nyttig for pedagogiske formål, og viser en klar og konsekvent skrivestil. Det kan være likt et kapittel fra en lærebok eller en detaljert veiledning som tilbyr betydelig pedagogisk innhold, inkludert øvelser og løsninger, med minimal irrelevant informasjon. Innholdet er sammenhengende, fokusert og verdifullt for strukturert læring.
+- Tildel et femte poeng hvis utdraget er enestående i sin pedagogiske verdi, perfekt egnet for undervisning opp til videregående skole. Det følger detaljert resonnement, skrivestilen er lett å følge og tilbyr grundig innsikt i emnet, uten ikke-pedagogisk eller overdrevent komplekst innhold.
+
+Utdraget skal være på norsk. Hvis det for det meste er på et annet språk, skal det gis 0 poeng.
+
+Utdraget: """,
+    """
+Etter å ha undersøkt utdraget:
+
+* Begrunn kort din totale poengsum, opptil 100 ord.
+* Avslutt ditt svar med poeng i formatet: \"Pedagogisk verdi: <total poeng>\"""",
 ]
 
 PROMPT_EN = [
@@ -33,7 +139,7 @@ The extract:
 After examining the extract:
 
 * First briefly justify your total score, up to 50 words.
-* Conclude with the score in the format: "Educational value: <total points>""",
+* Conclude with the score in the format: \"Educational value: <total points>\"""",
 ]
 
 PROMPT_FINEWEB = [

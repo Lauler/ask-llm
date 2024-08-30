@@ -94,8 +94,9 @@ def apply_fineweb_prompt(
         extract, truncation=True, max_length=max_tokens, add_special_tokens=False
     )
     extract_string = tokenizer.decode(extract_ids)
+    example["extract"] = extract_string
 
-    prompt = "\n".join([prompt[0].format(language), extract_string, prompt[1]])
+    prompt = "\n".join([prompt[0].format(language=language), extract_string, prompt[1]])
 
     if prompt_type == "gemma":
         messages = [
@@ -117,18 +118,14 @@ def apply_fineweb_prompt(
     return example
 
 
-def fineweb_prompt_prefix_length(
-    prompt, tokenizer, language="Swedish", prompt_type="llama"
-):
+def fineweb_prompt_prefix_length(prompt, tokenizer, language="Swedish", prompt_type="llama"):
     # format the extract with python .format and return the prompt as dict
     # for prefix
     # tokenize to get length
     # add number dependending on llama/gemma chat_template
     # llama 47:
     # gemma 4:
-    prefix_len = len(
-        tokenizer.encode(prompt[0].format(language), add_special_tokens=False)
-    )
+    prefix_len = len(tokenizer.encode(prompt[0].format(language), add_special_tokens=False))
 
     if prompt_type == "gemma":
         magic_number = 4
