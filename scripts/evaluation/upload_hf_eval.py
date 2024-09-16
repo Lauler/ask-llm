@@ -52,7 +52,6 @@ def parse_score_from_text(row):
             return row["json"]["educational score"]
         elif "educational_score" in row["json"]:
             return row["json"]["educational_score"]
-
     elif "no" in row["prompt_type"]:
         text = row["text_score"]
         # Grab the digit after "Pedagogisk verdi: "
@@ -65,7 +64,13 @@ def parse_score_from_text(row):
         educational_score = re.findall(r"Pedagogiskt värde: (\d)", text)
         if educational_score:
             return int(educational_score[0])
+    return None
 
+
+def parse_askllm_score(row):
+    if "askllm" in row["prompt_type"]:
+        text = row["text_score"]
+        return float(text)
     return None
 
 
@@ -83,6 +88,7 @@ if __name__ == "__main__":
 
     df["json"] = df.apply(parse_json_from_text, axis=1)
     df["educational_score"] = df.apply(parse_score_from_text, axis=1)
+    df["askllm_score"] = df.apply(parse_askllm_score, axis=1)
 
     df_json = df[df["prompt_type"].str.contains("json")]
     print(
@@ -116,6 +122,8 @@ if __name__ == "__main__":
     df.to_json(
         "output/eval/eval_educational.jsonl", orient="records", lines=True, force_ascii=False
     )
+
+    df.to_parquet("output/eval/eval_educational.parquet")
 
     # dataset.to_json(
     #     "output/eval/eval_educational.jsonl", orient="records", lines=True, force_ascii=False
