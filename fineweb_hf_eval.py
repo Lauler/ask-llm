@@ -18,12 +18,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from datasets import load_dataset, Dataset, load_from_disk
 import torch
 import logging
+from datetime import datetime
 
 args = ArgumentParser()
 args.add_argument("--model_name", type=str, default="models/Meta-Llama-3-70B-Instruct")
 args.add_argument("--prompt", type=str, default="swedish")
-args.add_argument("--data_shard", type=int, default=0)
-args.add_argument("--num_samples", type=int, default=40)
 args.add_argument("--batch_size", type=int, default=8)
 args.add_argument("--max_new_tokens", type=int, default=250)
 args.add_argument("--language", type=str, default="Swedish")
@@ -32,7 +31,14 @@ args.add_argument("--output_dir", type=str, default="output/")
 args.add_argument("--input_file", type=str, required=True)
 args = args.parse_args()
 
-logging.basicConfig(level=logging.INFO)
+current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+logging.basicConfig(
+    # filename=f"logs/{os.path.basename(args.model_name)}_{args.prompt}_{current_time}.log",
+    level=logging.INFO,
+    datefmt="%Y-%m-%d %H:%M:%S",
+    format="%(asctime)s | %(name)s | %(levelname)s | %(message)s",
+)
+
 logger = logging.getLogger(__name__)
 logger.info(args)
 
@@ -63,9 +69,9 @@ if "llama" in args.model_name.lower():
     elif "70b" in args.model_name.lower():
         model_type = "llama70b"
 elif "gemma" in args.model_name.lower():
-    model_type = "gemma"
+    model_type = "gemma27b"
 
-logging.info(f"Loading model: {args.model_name}")
+logger.info(f"Loading model: {args.model_name}")
 model = AutoModelForCausalLM.from_pretrained(
     args.model_name,
     torch_dtype=torch.bfloat16,
@@ -79,7 +85,7 @@ model.config.pad_token_id = model.config.eos_token_id
 
 
 # dataset = load_dataset("data/culturax_sv_sharded", num_proc=12)
-logging.info(f"Loading dataset: {args.input_file}")
+logger.info(f"Loading dataset: {args.input_file}")
 dataset = load_dataset(
     "json",
     data_files={"train": args.input_file},
@@ -94,25 +100,31 @@ if "sv" in args.prompt:
     ds = ds.filter(lambda x: x["language"] == "sv")
 elif "no" in args.prompt:
     ds = ds.filter(lambda x: x["language"] == "no")
+else:
+    if args.language == "Swedish":
+        ds = ds.filter(lambda x: x["language"] == "sv")
+    elif args.language == "Norwegian":
+        ds = ds.filter(lambda x: x["language"] == "no")
+
 
 # Apply prompt template and save the result
-logging.info(f"Applying prompts")
+logger.info(f"Applying prompts")
 ds = ds.map(
     apply_fineweb_prompt,
     batched=False,
-    num_proc=8,
+    num_proc=4,
     fn_kwargs={
         "prompt": PROMPT,
         "tokenizer": tokenizer,
         "language": args.language,
         "max_tokens": 512,
-        "prompt_type": model_type,
+        "prompt_type": "gemma" if "gemma" in model_type else "llama",
     },
 )
 
-logging.info(f"Example: {ds[0]}")
+logger.info(f"Example: {ds[0]}")
 
-logging.info(f"create dataloader")
+logger.info(f"create dataloader")
 dataloader = torch.utils.data.DataLoader(
     ds, batch_size=args.batch_size, num_workers=2, pin_memory=True
 )
@@ -120,7 +132,7 @@ dataloader = torch.utils.data.DataLoader(
 generated_texts = []
 
 # Generate with dataloader
-logging.info(f"annotate batches")
+logger.info(f"annotate batches")
 for batch in tqdm(dataloader):
     text_prompts = batch["text_prompt"]
     model_inputs = tokenizer(
@@ -148,12 +160,27 @@ for batch in tqdm(dataloader):
 ds = ds.add_column("text_score", generated_texts)
 # ds.to_parquet(os.path.join(args.output_dir, os.path.basename(args.input_file) + f"{prompt_type}.{args.prompt}.parquet"))
 
-ds = ds.add_column("model_name", [args.model_name] * len(ds))
+# If user added a "/" at the end of the model_name, remove it
+if args.model_name[-1] == "/":
+    args.model_name = args.model_name[:-1]
+
+model_name = args.model_name.split("/")[-1]
+ds = ds.add_column("model_name", [model_name] * len(ds))
 ds = ds.add_column("prompt_type", [args.prompt] * len(ds))
 
-ds.to_json(
-    os.path.join(
+if args.prompt == "fineweb":
+    # English prompt, specifying the language of the extract in the prompt
+    file_path = os.path.join(
+        args.output_dir,
+        os.path.basename(args.input_file) + args.language + f".{model_type}.{args.prompt}.jsonl",
+    )
+else:
+    # Prompt written in the same language as the extract
+    file_path = os.path.join(
         args.output_dir, os.path.basename(args.input_file) + f"{model_type}.{args.prompt}.jsonl"
-    ),
+    )
+
+ds.to_json(
+    file_path,
     force_ascii=False,
 )

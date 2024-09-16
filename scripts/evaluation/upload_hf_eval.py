@@ -49,9 +49,9 @@ def parse_score_from_text(row):
     if "json" in row["prompt_type"]:
         # Check if the json object has an "educational score" or "educational_score" key
         if "educational score" in row["json"]:
-            return row["json"]["educational score"]
+            return int(row["json"]["educational score"])
         elif "educational_score" in row["json"]:
-            return row["json"]["educational_score"]
+            return int(row["json"]["educational_score"])
     elif "no" in row["prompt_type"]:
         text = row["text_score"]
         # Grab the digit after "Pedagogisk verdi: "
@@ -64,13 +64,22 @@ def parse_score_from_text(row):
         educational_score = re.findall(r"Pedagogiskt värde: (\d)", text)
         if educational_score:
             return int(educational_score[0])
+    elif "fineweb" in row["prompt_type"]:
+        text = row["text_score"]
+        # Grab the digit after "Educational score: "
+        educational_score = re.findall(r"Educational_score: (\d)", text)
+        if educational_score:
+            return int(educational_score[0])
     return None
 
 
 def parse_askllm_score(row):
     if "askllm" in row["prompt_type"]:
         text = row["text_score"]
-        return float(text)
+        try:
+            return float(text)
+        except ValueError:
+            return None
     return None
 
 
