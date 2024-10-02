@@ -22,7 +22,7 @@ def parse_json_from_text(row):
             json_text = re.findall(r"(\{.*?\})", json_text[0], re.DOTALL)
 
         if not json_text:
-            json_text = {"reason": None, "educational score": None}
+            json_text = {"reason": None, "educational_score": None}
             return json_text
 
         # Grab everything between { and } including the brackets
@@ -38,7 +38,11 @@ def parse_json_from_text(row):
             json_text = json.loads(json_text)
         except json.JSONDecodeError as e:
             # print(e)
-            json_text = {"reason": None, "educational score": None}
+            json_text = {"reason": None, "educational_score": None}
+
+        if "educational score" in json_text:
+            # Standardize the key to "educational_score"
+            json_text["educational_score"] = json_text.pop("educational score")
 
         return json_text
 
